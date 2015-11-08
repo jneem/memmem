@@ -20,8 +20,6 @@ pub struct TwoWaySearcher<'a> {
 
     /// critical factorization index
     crit_pos: usize,
-    /// critical factorization index for reversed needle
-    crit_pos_back: usize,
     period: usize,
     /// `byteset` is an extension (not part of the two way algorithm);
     /// it's a 64-bit "fingerprint" where each set bit `j` corresponds
@@ -161,18 +159,10 @@ impl<'a> TwoWaySearcher<'a> {
             // x = u' v' where |v'| < period(x).
             //
             // This is sped up by the period being known already.
-            // Note that a case like x = "acba" may be factored exactly forwards
-            // (crit_pos = 1, period = 3) while being factored with approximate
-            // period in reverse (crit_pos = 2, period = 2). We use the given
-            // reverse factorization but keep the exact period.
-            let crit_pos_back = needle.len() - cmp::max(
-                TwoWaySearcher::reverse_maximal_suffix(needle, period, false),
-                TwoWaySearcher::reverse_maximal_suffix(needle, period, true));
 
             TwoWaySearcher {
                 needle: needle,
                 crit_pos: crit_pos,
-                crit_pos_back: crit_pos_back,
                 period: period,
                 byteset: Self::byteset_create(&needle[..period]),
                 is_long: false,
@@ -182,13 +172,10 @@ impl<'a> TwoWaySearcher<'a> {
             // and don't use memorization.
             //
             // Approximate the period by lower bound max(|u|, |v|) + 1.
-            // The critical factorization is efficient to use for both forward and
-            // reverse search.
 
             TwoWaySearcher {
                 needle: needle,
                 crit_pos: crit_pos,
-                crit_pos_back: crit_pos,
                 period: cmp::max(crit_pos, needle.len() - crit_pos) + 1,
                 byteset: Self::byteset_create(needle),
                 is_long: true,
@@ -315,58 +302,6 @@ impl<'a> TwoWaySearcher<'a> {
         }
         (left, period)
     }
-
-    // Compute the maximal suffix of the reverse of `arr`.
-    //
-    // The maximal suffix is a possible critical factorization (u', v') of `arr`.
-    //
-    // Returns `i` where `i` is the starting index of v', from the back;
-    // returns immedately when a period of `known_period` is reached.
-    //
-    // `order_greater` determines if lexical order is `<` or `>`. Both
-    // orders must be computed -- the ordering with the largest `i` gives
-    // a critical factorization.
-    //
-    // For long period cases, the resulting period is not exact (it is too short).
-    fn reverse_maximal_suffix(arr: &[u8], known_period: usize,
-                              order_greater: bool) -> usize
-    {
-        let mut left = 0; // Corresponds to i in the paper
-        let mut right = 1; // Corresponds to j in the paper
-        let mut offset = 0; // Corresponds to k in the paper, but starting at 0
-                            // to match 0-based indexing.
-        let mut period = 1; // Corresponds to p in the paper
-        let n = arr.len();
-
-        while right + offset < n {
-            let a = arr[n - (1 + right + offset)];
-            let b = arr[n - (1 + left + offset)];
-            if (a < b && !order_greater) || (a > b && order_greater) {
-                // Suffix is smaller, period is entire prefix so far.
-                right += offset + 1;
-                offset = 0;
-                period = right - left;
-            } else if a == b {
-                // Advance through repetition of the current period.
-                if offset + 1 == period {
-                    right += offset + 1;
-                    offset = 0;
-                } else {
-                    offset += 1;
-                }
-            } else {
-                // Suffix is larger, start over from current location.
-                left = right;
-                right += 1;
-                offset = 0;
-                period = 1;
-            }
-            if period == known_period {
-                break;
-            }
-        }
-        debug_assert!(period <= known_period);
-        left
-    }
 }
+
 
