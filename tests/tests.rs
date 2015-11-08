@@ -20,10 +20,13 @@ macro_rules! search(
     );
 );
 
-search!(periodic_1, "aaaaaaaa", "aaaaaaabaaaaaaabaaaaaaabaaaaaaaa", Some(24));
-search!(periodic_2, "aaaaaaaa", "aaaaaaabaaaaaaabaaaaaaabaaaaaaab", None);
-search!(periodic_3, "abcabc", "abcabdabcabdabcabdabcabc", Some(18));
-search!(periodic_4, "abcabc", "abcabdabcabdabcabdabcabd", None);
+search!(periodic_1, "aaaaaaaa", "aaaaaabaaaaaabaaaaaabaaaaaaaa", Some(21));
+search!(periodic_2, "aaaaaaaa", "aaaaaabaaaaaabaaaaaabaaaaaaab", None);
+search!(periodic_3, "abcabc", "abcabaabcabaabcabaabcabc", Some(18));
+search!(periodic_4, "abcabc", "abcabaabcabaabcabaabcabd", None);
+search!(periodic_5, "abcabcabc", "bbcabcabcabc", Some(3));
 
 search!(aperiodic_1, "dog", "The quick brown fox jumped over the lazy dog.", Some(41));
 search!(aperiodic_2, "doggy", "The quick brown fox jumped over the lazy dog.", None);
+
+search!(skip, "aaaaaaaa", "aaaaaaabaaaaaaabaaaaaaab", None);
