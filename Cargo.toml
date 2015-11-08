@@ -2,6 +2,9 @@
 name = "memmem"
 version = "0.1.0"
 authors = ["Joe Neeman <joeneeman@gmail.com>"]
-description = "Quickly search for patterns in memory"
+description = "Substring searching"
+documentation = "http://jneem.github.io/memmem"
+repository = "http://github.com/jneem/memmem"
+readme = "README.md"
 license = "MIT/Apache-2.0"
 
