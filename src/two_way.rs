@@ -11,7 +11,9 @@ use std::cmp;
 use std::usize;
 use super::Searcher;
 
-/// The internal state of the two-way substring search algorithm.
+/// Searches for a substring using the "two-way" algorithm of Crochemore and Perrin, D.
+///
+/// This implementation is basically copied from rust's standard library.
 #[derive(Clone, Debug)]
 pub struct TwoWaySearcher<'a> {
     needle: &'a [u8],
@@ -132,6 +134,7 @@ impl<'a> Searcher for TwoWaySearcher<'a> {
 
 */
 impl<'a> TwoWaySearcher<'a> {
+    /// Creates a new `TwoWaySearcher` that can be used to search for `needle`.
     pub fn new<'b>(needle: &'b [u8]) -> TwoWaySearcher<'b> {
         let (crit_pos_false, period_false) = TwoWaySearcher::maximal_suffix(needle, false);
         let (crit_pos_true, period_true) = TwoWaySearcher::maximal_suffix(needle, true);
