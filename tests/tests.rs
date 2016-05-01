@@ -20,6 +20,9 @@ macro_rules! search(
     );
 );
 
+search!(empty_1, "", "", Some(0));
+search!(empty_2, "", "something", Some(0));
+
 search!(periodic_1, "aaaaaaaa", "aaaaaabaaaaaabaaaaaabaaaaaaaa", Some(21));
 search!(periodic_2, "aaaaaaaa", "aaaaaabaaaaaabaaaaaabaaaaaaab", None);
 search!(periodic_3, "abcabc", "abcabaabcabaabcabaabcabc", Some(18));

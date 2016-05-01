@@ -38,9 +38,9 @@ struct TwoWayState {
 
 impl<'a> Searcher for TwoWaySearcher<'a> {
     fn search_in(&self, haystack: &[u8]) -> Option<usize> {
-        // write out `true` and `false` cases to encourage the compiler
-        // to specialize the two cases separately.
-        if self.is_long {
+        if self.needle.is_empty() {
+            Some(0)
+        } else if self.is_long {
             let state = TwoWayState {
                 position: 0,
                 memory: usize::MAX,
@@ -134,6 +134,16 @@ impl<'a> Searcher for TwoWaySearcher<'a> {
 impl<'a> TwoWaySearcher<'a> {
     /// Creates a new `TwoWaySearcher` that can be used to search for `needle`.
     pub fn new<'b>(needle: &'b [u8]) -> TwoWaySearcher<'b> {
+        if needle.is_empty() {
+            return TwoWaySearcher {
+                needle: needle,
+                crit_pos: 0,
+                period: 0,
+                byteset: 0,
+                is_long: false,
+            };
+        }
+
         let (crit_pos_false, period_false) = TwoWaySearcher::maximal_suffix(needle, false);
         let (crit_pos_true, period_true) = TwoWaySearcher::maximal_suffix(needle, true);
 
@@ -304,4 +314,21 @@ impl<'a> TwoWaySearcher<'a> {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use {Searcher, TwoWaySearcher};
+    use quickcheck::quickcheck;
+
+    #[test]
+    fn same_as_std() {
+        fn prop(needle: String, haystack: String) -> bool {
+            let search = TwoWaySearcher::new(needle.as_bytes());
+            search.search_in(haystack.as_bytes()) == haystack.find(&needle)
+        }
+
+        quickcheck(prop as fn(String, String) -> bool);
+    }
+
+
+}
 

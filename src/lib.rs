@@ -19,6 +19,9 @@ assert_eq!(search.search_in("The quick brown fox jumped over the lazy dog.".as_b
 ```
 */
 
+#[cfg(test)]
+extern crate quickcheck;
+
 mod two_way;
 
 pub use two_way::TwoWaySearcher;
