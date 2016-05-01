@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["TwoWaySearcher","Searches for a substring using the \"two-way\" algorithm of Crochemore and Perrin, D."]],"trait":[["Searcher","A trait that searches for patterns in byte-strings."]]});
